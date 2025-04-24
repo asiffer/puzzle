@@ -29,6 +29,7 @@ func init() {
 	puzzle.Uint16Converter.Register(FlagFrontend, puzzle.ConvertCallbackFactory1(uint16Flag))
 	puzzle.Uint32Converter.Register(FlagFrontend, puzzle.ConvertCallbackFactory1(uint32Flag))
 	puzzle.StringSliceConverter.Register(FlagFrontend, puzzle.ConvertCallbackFactory1(stringSliceFlag))
+	puzzle.Float32Converter.Register(FlagFrontend, puzzle.ConvertCallbackFactory1(float32Flag))
 }
 
 // supported types
@@ -116,6 +117,11 @@ func uint32Flag(entry *puzzle.Entry[uint32], fs *flag.FlagSet) error {
 }
 
 func stringSliceFlag(entry *puzzle.Entry[[]string], fs *flag.FlagSet) error {
+	fs.Var(entry, entry.Metadata.FlagName, entry.Metadata.Description)
+	return nil
+}
+
+func float32Flag(entry *puzzle.Entry[float32], fs *flag.FlagSet) error {
 	fs.Var(entry, entry.Metadata.FlagName, entry.Metadata.Description)
 	return nil
 }
