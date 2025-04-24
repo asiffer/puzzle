@@ -13,7 +13,7 @@
 
 `puzzle` aims to centralize the configuration management and to **automatically create the bindings** you need from other sources at runtime. No annotations, just generics.
 
-
+[![Go Report Card](https://goreportcard.com/badge/github.com/asiffer/puzzle)](https://goreportcard.com/report/github.com/asiffer/puzzle) [![Test](https://github.com/asiffer/puzzle/actions/workflows/test.yml/badge.svg)](https://github.com/asiffer/puzzle/actions/workflows/test.yml)
 
 ## Install
 
