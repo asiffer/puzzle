@@ -57,7 +57,8 @@ func (c *converter[T]) Register(name Frontend, callback ConvertCallback[T]) erro
 func (c *converter[T]) Convert(name Frontend, entry *Entry[T], args ...any) error {
 	callback, exists := c.frontends[name]
 	if !exists {
-		return fmt.Errorf("frontend %s does not exist", name)
+		var t T
+		return fmt.Errorf("frontend %s does not exist (type: %T)", name, t)
 	}
 	return callback(entry, args...)
 }
