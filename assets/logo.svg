@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256">
+    <style>
+        .scale-group {
+            animation: scalePulse 0.5s normal ease-out;
+            transform-origin: 128px 128px;
+        }
+
+        @keyframes scalePulse {
+            0% {
+                transform: scale(10);
+            }
+
+            100% {
+                transform: scale(1);
+            }
+        }
+    </style>
+    <g class="scale-group">
+        <g transform="translate(0, -10) rotate(45, 128, 128)">
+            <rect width="256" height="256" fill="none" />
+            <path
+                d="M64,216a8,8,0,0,1-8-8V165.31a28,28,0,1,1,0-50.62V72a8,8,0,0,1,8-8h46.69a28,28,0,1,1,50.61,0H208a8,8,0,0,1,8,8v42.69a28,28,0,1,0,0,50.62V208a8,8,0,0,1-8,8Z"
+                stroke="#00ADD8" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="6" />
+        </g>
+    </g>
+</svg>
