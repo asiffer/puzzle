@@ -11,12 +11,7 @@ const PFlagFrontend puzzle.Frontend = "pflagset"
 
 func Build(c *puzzle.Config, name string, h pflag.ErrorHandling) (*pflag.FlagSet, error) {
 	flagset := pflag.NewFlagSet(name, h)
-	for entry := range c.Entries() {
-		if err := entry.Convert(PFlagFrontend, flagset); err != nil {
-			return nil, err
-		}
-	}
-	return flagset, nil
+	return flagset, Populate(c, flagset)
 }
 
 func Populate(c *puzzle.Config, flagset *pflag.FlagSet) error {
