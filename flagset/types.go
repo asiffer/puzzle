@@ -11,28 +11,39 @@ import (
 // during the init phase we inject the frontend into every converter
 func init() {
 	// default
-	puzzle.BoolConverter.Register(FlagFrontend, puzzle.ConvertCallbackFactory1(boolFlag))
-	puzzle.DurationConverter.Register(FlagFrontend, puzzle.ConvertCallbackFactory1(durationFlag))
-	puzzle.Float64Converter.Register(FlagFrontend, puzzle.ConvertCallbackFactory1(float64Flag))
-	puzzle.IntConverter.Register(FlagFrontend, puzzle.ConvertCallbackFactory1(intFlag))
-	puzzle.Int64Converter.Register(FlagFrontend, puzzle.ConvertCallbackFactory1(int64Flag))
-	puzzle.StringConverter.Register(FlagFrontend, puzzle.ConvertCallbackFactory1(stringFlag))
-	puzzle.UintConverter.Register(FlagFrontend, puzzle.ConvertCallbackFactory1(uintFlag))
-	puzzle.Uint64Converter.Register(FlagFrontend, puzzle.ConvertCallbackFactory1(uint64Flag))
+	puzzle.BoolConverter.Register(FlagFrontend, puzzle.ConvertCallbackFactory1(ignoreFlag(boolFlag)))
+	puzzle.DurationConverter.Register(FlagFrontend, puzzle.ConvertCallbackFactory1(ignoreFlag(durationFlag)))
+	puzzle.Float64Converter.Register(FlagFrontend, puzzle.ConvertCallbackFactory1(ignoreFlag(float64Flag)))
+	puzzle.IntConverter.Register(FlagFrontend, puzzle.ConvertCallbackFactory1(ignoreFlag(intFlag)))
+	puzzle.Int64Converter.Register(FlagFrontend, puzzle.ConvertCallbackFactory1(ignoreFlag(int64Flag)))
+	puzzle.StringConverter.Register(FlagFrontend, puzzle.ConvertCallbackFactory1(ignoreFlag(stringFlag)))
+	puzzle.UintConverter.Register(FlagFrontend, puzzle.ConvertCallbackFactory1(ignoreFlag(uintFlag)))
+	puzzle.Uint64Converter.Register(FlagFrontend, puzzle.ConvertCallbackFactory1(ignoreFlag(uint64Flag)))
 	// extended
-	puzzle.BytesConverter.Register(FlagFrontend, puzzle.ConvertCallbackFactory1(bytesFlag))
-	puzzle.IPConverter.Register(FlagFrontend, puzzle.ConvertCallbackFactory1(ipFlag))
-	puzzle.Int8Converter.Register(FlagFrontend, puzzle.ConvertCallbackFactory1(int8Flag))
-	puzzle.Int16Converter.Register(FlagFrontend, puzzle.ConvertCallbackFactory1(int16Flag))
-	puzzle.Int32Converter.Register(FlagFrontend, puzzle.ConvertCallbackFactory1(int32Flag))
-	puzzle.Uint8Converter.Register(FlagFrontend, puzzle.ConvertCallbackFactory1(uint8Flag))
-	puzzle.Uint16Converter.Register(FlagFrontend, puzzle.ConvertCallbackFactory1(uint16Flag))
-	puzzle.Uint32Converter.Register(FlagFrontend, puzzle.ConvertCallbackFactory1(uint32Flag))
-	puzzle.StringSliceConverter.Register(FlagFrontend, puzzle.ConvertCallbackFactory1(stringSliceFlag))
-	puzzle.Float32Converter.Register(FlagFrontend, puzzle.ConvertCallbackFactory1(float32Flag))
+	puzzle.BytesConverter.Register(FlagFrontend, puzzle.ConvertCallbackFactory1(ignoreFlag(bytesFlag)))
+	puzzle.IPConverter.Register(FlagFrontend, puzzle.ConvertCallbackFactory1(ignoreFlag(ipFlag)))
+	puzzle.Int8Converter.Register(FlagFrontend, puzzle.ConvertCallbackFactory1(ignoreFlag(int8Flag)))
+	puzzle.Int16Converter.Register(FlagFrontend, puzzle.ConvertCallbackFactory1(ignoreFlag(int16Flag)))
+	puzzle.Int32Converter.Register(FlagFrontend, puzzle.ConvertCallbackFactory1(ignoreFlag(int32Flag)))
+	puzzle.Uint8Converter.Register(FlagFrontend, puzzle.ConvertCallbackFactory1(ignoreFlag(uint8Flag)))
+	puzzle.Uint16Converter.Register(FlagFrontend, puzzle.ConvertCallbackFactory1(ignoreFlag(uint16Flag)))
+	puzzle.Uint32Converter.Register(FlagFrontend, puzzle.ConvertCallbackFactory1(ignoreFlag(uint32Flag)))
+	puzzle.StringSliceConverter.Register(FlagFrontend, puzzle.ConvertCallbackFactory1(ignoreFlag(stringSliceFlag)))
+	puzzle.Float32Converter.Register(FlagFrontend, puzzle.ConvertCallbackFactory1(ignoreFlag(float32Flag)))
 }
 
 // supported types
+
+type flagFun[T any] func(entry *puzzle.Entry[T], fs *flag.FlagSet) error
+
+func ignoreFlag[T any](f flagFun[T]) flagFun[T] {
+	return func(entry *puzzle.Entry[T], fs *flag.FlagSet) error {
+		if entry.Metadata.FlagName == "" {
+			return nil
+		}
+		return f(entry, fs)
+	}
+}
 
 func boolFlag(entry *puzzle.Entry[bool], fs *flag.FlagSet) error {
 	fs.BoolVar(entry.ValueP, entry.Metadata.FlagName, entry.Value, entry.Metadata.Description)
