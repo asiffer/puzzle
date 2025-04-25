@@ -104,7 +104,7 @@ func testConverter[T comparable](converter Converter[T], stringValue string, exp
 }
 
 func testConverterAny[T any](converter Converter[T], stringValue string, expected T, check func(v T) bool, modifiers ...EntryModifier[T]) error {
-	e := newEntry[T](gofakeit.LetterN(8))
+	e := NewEntry[T](gofakeit.LetterN(8))
 	for _, mod := range modifiers {
 		mod(e)
 	}

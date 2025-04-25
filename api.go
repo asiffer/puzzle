@@ -19,7 +19,7 @@ func insert[T any](config *Config, entry *Entry[T], options ...MetadataOption) e
 
 // Define lets the config object store the Value
 func Define[T any](config *Config, key string, defaultValue T, options ...MetadataOption) error {
-	entry := newEntry[T](key)
+	entry := NewEntry[T](key)
 	entry.Value = defaultValue // store the Value locally
 	entry.ValueP = &entry.Value
 	return insert(config, entry, options...)
@@ -27,7 +27,7 @@ func Define[T any](config *Config, key string, defaultValue T, options ...Metada
 
 // DefineVar lets the user store the Value
 func DefineVar[T any](config *Config, key string, boundVariable *T, options ...MetadataOption) error {
-	entry := newEntry[T](key)
+	entry := NewEntry[T](key)
 	entry.Value = *boundVariable
 	entry.ValueP = boundVariable // keep the provided storage
 

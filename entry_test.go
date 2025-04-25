@@ -15,7 +15,7 @@ func TestEnvName(t *testing.T) {
 	}
 
 	for k, v := range truth {
-		e := newEntry[bool](k)
+		e := NewEntry[bool](k)
 
 		if e.Metadata.EnvName != v {
 			t.Errorf("Expected %s, got %s", v, e.Metadata.EnvName)
@@ -36,7 +36,7 @@ func TestFlagName(t *testing.T) {
 	}
 
 	for k, v := range truth {
-		e := newEntry[bool](k)
+		e := NewEntry[bool](k)
 		if e.Metadata.FlagName != v {
 			t.Errorf("Expected %s, got %s", v, e.Metadata.FlagName)
 		}

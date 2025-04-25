@@ -18,7 +18,7 @@ type Entry[T any] struct {
 	converter Converter[T]
 }
 
-func newEntry[T any](Key string) *Entry[T] {
+func NewEntry[T any](Key string) *Entry[T] {
 	e := Entry[T]{Key: Key}
 	// by default we bind the to the local storage
 	e.ValueP = &e.Value
@@ -99,7 +99,7 @@ func (e *Entry[T]) GetMetadata() *EntryMetadata {
 
 // Method to be compatible with flag.Value interface (and spf13/pflag.Value interface)
 func (e *Entry[T]) String() string {
-	switch v := any(e.Value).(type) {
+	switch v := any(*e.ValueP).(type) {
 	case time.Duration:
 		return v.String()
 	case net.IP:
@@ -132,4 +132,8 @@ func (e *Entry[T]) Set(value string) error {
 // Method to be compatible with spf13/pflag.Value interface
 func (e *Entry[T]) Type() string {
 	return fmt.Sprintf("%T", e.Value)
+}
+
+func (e *Entry[T]) Get() interface{} {
+	return e.GetValue()
 }
