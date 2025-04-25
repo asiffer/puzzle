@@ -9,11 +9,16 @@
 
 ## Introduction
 
-**All we need is configuration**. Yes we also need commands, flags, env variables, config files... but they are just feeds, *frontends*. Why should I create a config from what I defined in command flags? And not the opposite?
+**All we need is configuration**. Yes we also need commands, flags, env variables, config files... but they are just *frontends*. Why should we create configuration from command flags? And not the opposite?
 
-`puzzle` aims to centralize the configuration management and to **automatically create the bindings** you need from other sources at runtime. No annotations, just generics.
+`puzzle` aims to centralize the configuration management and to **automatically create the bindings** you need from other sources at runtime (like environment, json files, [`flag`](https://pkg.go.dev/flag), [`spf13/cobra`](https://github.com/spf13/cobra), [`urfave/cli`](https://github.com/urfave/cli)...). No annotations, just generics.
 
-[![Go Report Card](https://goreportcard.com/badge/github.com/asiffer/puzzle)](https://goreportcard.com/report/github.com/asiffer/puzzle) [![Test](https://github.com/asiffer/puzzle/actions/workflows/test.yml/badge.svg)](https://github.com/asiffer/puzzle/actions/workflows/test.yml) [![Go Reference](https://pkg.go.dev/badge/github.com/asiffer/puzzle.svg)](https://pkg.go.dev/github.com/asiffer/puzzle)
+[![Go Report Card](https://goreportcard.com/badge/github.com/asiffer/puzzle)](https://goreportcard.com/report/github.com/asiffer/puzzle) 
+[![Test](https://github.com/asiffer/puzzle/actions/workflows/test.yml/badge.svg)](https://github.com/asiffer/puzzle/actions/workflows/test.yml) 
+[![Go Reference](https://pkg.go.dev/badge/github.com/asiffer/puzzle.svg)](https://pkg.go.dev/github.com/asiffer/puzzle)
+![GitHub License](https://img.shields.io/github/license/asiffer/puzzle)
+![Library base size](https://img.shields.io/badge/size-382_KB-green)
+
 
 ## Install
 
