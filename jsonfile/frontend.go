@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"os"
 	"strings"
+	"time"
 
 	"github.com/asiffer/puzzle"
 )
@@ -118,4 +119,35 @@ func ReadJSON(config *puzzle.Config) error {
 	}
 
 	return nil
+}
+
+func ToJSON(config *puzzle.Config) ([]byte, error) {
+	tmp := make(map[string]interface{})
+	for entry := range config.Entries() {
+		k := entry.GetKey()
+		tmp0 := tmp
+		if strings.Contains(k, config.NestingSeparator) {
+			keys := strings.Split(k, config.NestingSeparator)
+			// tmp0 := tmp
+			for i := 0; i < len(keys)-1; i++ {
+				if _, ok := tmp0[keys[i]]; !ok {
+					tmp0[keys[i]] = make(map[string]interface{})
+				}
+				tmp0 = tmp0[keys[i]].(map[string]interface{})
+			}
+			k = keys[len(keys)-1]
+		}
+
+		// in the json case we must return the real typed value in general
+		// but for some specific cases, we need to use the string representation
+		switch v := entry.GetValue().(type) {
+		case time.Duration:
+			tmp0[k] = entry.String()
+		case []byte:
+			tmp0[k] = entry.String()
+		default:
+			tmp0[k] = v
+		}
+	}
+	return json.Marshal(tmp)
 }

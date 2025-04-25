@@ -1,8 +1,12 @@
 package puzzle
 
 import (
+	"encoding/base32"
+	"encoding/base64"
+	"encoding/hex"
 	"fmt"
 	"net"
+	"strings"
 	"time"
 )
 
@@ -95,7 +99,25 @@ func (e *Entry[T]) GetMetadata() *EntryMetadata {
 
 // Method to be compatible with flag.Value interface (and spf13/pflag.Value interface)
 func (e *Entry[T]) String() string {
-	return fmt.Sprintf("%v", *e.ValueP)
+	switch v := any(e.Value).(type) {
+	case time.Duration:
+		return v.String()
+	case net.IP:
+		return v.String()
+	case []string:
+		return strings.Join(v, e.Metadata.SliceSeparator)
+	case []byte:
+		switch e.Metadata.Format {
+		case "base32":
+			return base32.StdEncoding.EncodeToString(v)
+		case "base64":
+			return base64.StdEncoding.EncodeToString(v)
+		default: // default to hex
+			return hex.EncodeToString(v)
+		}
+	default:
+		return fmt.Sprintf("%v", *e.ValueP)
+	}
 }
 
 func (e *Entry[T]) Convert(frontend Frontend, args ...any) error {

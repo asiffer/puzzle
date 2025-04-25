@@ -1,139 +1,69 @@
 package jsonfile
 
 import (
-	"crypto/rand"
-	"encoding/base64"
-	"encoding/json"
 	"fmt"
-	"net"
 	"os"
 	"path"
-	"strings"
 	"testing"
-	"time"
 
 	"github.com/asiffer/puzzle"
+	"github.com/asiffer/puzzle/frontendtesting"
 	"github.com/brianvoe/gofakeit/v7"
 )
 
-func sliceEqual[T comparable](a, b []T) bool {
-	if len(a) != len(b) {
-		return false
-	}
-	for i := range a {
-		if a[i] != b[i] {
-			return false
-		}
-	}
-	return true
+// func toJSON(config *puzzle.Config) ([]byte, error) {
+// 	tmp := make(map[string]interface{})
+// 	for entry := range config.Entries() {
+// 		k := entry.GetKey()
+// 		if strings.Contains(k, config.NestingSeparator) {
+// 			keys := strings.Split(k, config.NestingSeparator)
+// 			tmp0 := tmp
+// 			for i := 0; i < len(keys)-1; i++ {
+// 				if _, ok := tmp0[keys[i]]; !ok {
+// 					tmp0[keys[i]] = make(map[string]interface{})
+// 				}
+// 				tmp0 = tmp0[keys[i]].(map[string]interface{})
+// 			}
+// 			k = keys[len(keys)-1]
+// 			tmp0[k] = entry.GetValue()
+// 		} else {
+// 			tmp[k] = entry.GetValue()
+// 		}
 
-}
+// 		switch v := tmp[k].(type) {
+// 		case net.IP:
+// 			tmp[k] = v.String()
+// 		case time.Duration:
+// 			tmp[k] = v.String()
+// 		case []byte:
+// 			tmp[k] = base64.StdEncoding.EncodeToString(v)
+// 		}
+// 	}
+// 	return json.Marshal(tmp)
+// }
 
-func randomBytes(n int) []byte {
-	b := make([]byte, n)
-	if _, err := rand.Read(b); err != nil {
-		panic(err)
-	}
-	return b
-}
-
-func toJSON(config *puzzle.Config) ([]byte, error) {
-	tmp := make(map[string]interface{})
-	for entry := range config.Entries() {
-		k := entry.GetKey()
-		if strings.Contains(k, config.NestingSeparator) {
-			keys := strings.Split(k, config.NestingSeparator)
-			tmp0 := tmp
-			for i := 0; i < len(keys)-1; i++ {
-				if _, ok := tmp0[keys[i]]; !ok {
-					tmp0[keys[i]] = make(map[string]interface{})
-				}
-				tmp0 = tmp0[keys[i]].(map[string]interface{})
-			}
-			k = keys[len(keys)-1]
-			tmp0[k] = entry.GetValue()
-		} else {
-			tmp[k] = entry.GetValue()
-		}
-
-		switch v := tmp[k].(type) {
-		case net.IP:
-			tmp[k] = v.String()
-		case time.Duration:
-			tmp[k] = v.String()
-		case []byte:
-			tmp[k] = base64.StdEncoding.EncodeToString(v)
-		}
-	}
-	return json.Marshal(tmp)
-}
-
-type allTypes struct {
-	b     bool
-	s     string
-	i     int
-	i8    int8
-	i16   int16
-	i32   int32
-	i64   int64
-	u     uint
-	u8    uint8
-	u16   uint16
-	u32   uint32
-	u64   uint64
-	f32   float32
-	f64   float64
-	d     time.Duration
-	ip    net.IP
-	bytes []byte
-	ss    []string
-}
-
-func randomValues() *allTypes {
-	return &allTypes{
-		b:     gofakeit.Bool(),
-		s:     gofakeit.Word(),
-		i:     gofakeit.Int(),
-		i8:    gofakeit.Int8(),
-		i16:   gofakeit.Int16(),
-		i32:   gofakeit.Int32(),
-		i64:   gofakeit.Int64(),
-		u:     gofakeit.Uint(),
-		u8:    gofakeit.Uint8(),
-		u16:   gofakeit.Uint16(),
-		u32:   gofakeit.Uint32(),
-		u64:   gofakeit.Uint64(),
-		f32:   gofakeit.Float32(),
-		f64:   gofakeit.Float64(),
-		d:     time.Duration(gofakeit.Int64()),
-		ip:    net.ParseIP(gofakeit.IPv4Address()),
-		bytes: randomBytes(64),
-		ss:    []string{gofakeit.Word(), gofakeit.Word(), gofakeit.Word()},
-	}
-}
-
-func randomConfig() (*puzzle.Config, *allTypes) {
+func randomConfig() (*puzzle.Config, *frontendtesting.AllTypes) {
 	config := puzzle.NewConfig()
-	defaultValues := randomValues()
+	defaultValues := frontendtesting.RandomValues()
 
-	puzzle.DefineVar(config, "bool", &defaultValues.b)
-	puzzle.DefineVar(config, "string", &defaultValues.s)
-	puzzle.DefineVar(config, "int", &defaultValues.i)
-	puzzle.DefineVar(config, "int8", &defaultValues.i8)
-	puzzle.DefineVar(config, "int16", &defaultValues.i16)
-	puzzle.DefineVar(config, "int32", &defaultValues.i32)
-	puzzle.DefineVar(config, "int64", &defaultValues.i64)
-	puzzle.DefineVar(config, "uint", &defaultValues.u)
-	puzzle.DefineVar(config, "uint8", &defaultValues.u8)
-	puzzle.DefineVar(config, "uint16", &defaultValues.u16)
-	puzzle.DefineVar(config, "uint32", &defaultValues.u32)
-	puzzle.DefineVar(config, "uint64", &defaultValues.u64)
-	puzzle.DefineVar(config, "float32", &defaultValues.f32)
-	puzzle.DefineVar(config, "float64", &defaultValues.f64)
-	puzzle.DefineVar(config, "duration", &defaultValues.d)
-	puzzle.DefineVar(config, "ip", &defaultValues.ip)
-	puzzle.DefineVar(config, "bytes", &defaultValues.bytes, puzzle.WithFormat("base64"))
-	puzzle.DefineVar(config, "string-slice", &defaultValues.ss)
+	puzzle.DefineVar(config, "bool", &defaultValues.B)
+	puzzle.DefineVar(config, "string", &defaultValues.S)
+	puzzle.DefineVar(config, "int", &defaultValues.I)
+	puzzle.DefineVar(config, "int8", &defaultValues.I8)
+	puzzle.DefineVar(config, "int16", &defaultValues.I16)
+	puzzle.DefineVar(config, "int32", &defaultValues.I32)
+	puzzle.DefineVar(config, "int64", &defaultValues.I64)
+	puzzle.DefineVar(config, "uint", &defaultValues.U)
+	puzzle.DefineVar(config, "uint8", &defaultValues.U8)
+	puzzle.DefineVar(config, "uint16", &defaultValues.U16)
+	puzzle.DefineVar(config, "uint32", &defaultValues.U32)
+	puzzle.DefineVar(config, "uint64", &defaultValues.U64)
+	puzzle.DefineVar(config, "float32", &defaultValues.F32)
+	puzzle.DefineVar(config, "float64", &defaultValues.F64)
+	puzzle.DefineVar(config, "duration", &defaultValues.D)
+	puzzle.DefineVar(config, "ip", &defaultValues.IP)
+	puzzle.DefineVar(config, "bytes", &defaultValues.Bytes, puzzle.WithFormat("base64"))
+	puzzle.DefineVar(config, "string-slice", &defaultValues.SS)
 
 	return config, defaultValues
 }
@@ -145,28 +75,28 @@ func nestedKey(key string, prefix string) string {
 	return fmt.Sprintf("%s%s%s", prefix, puzzle.DEFAULT_NESTING_SEPARATOR, key)
 }
 
-func randomNestedConfig() (*puzzle.Config, *allTypes) {
+func randomNestedConfig() (*puzzle.Config, *frontendtesting.AllTypes) {
 	config := puzzle.NewConfig()
-	defaultValues := randomValues()
+	defaultValues := frontendtesting.RandomValues()
 
-	puzzle.DefineVar(config, "bool", &defaultValues.b)
-	puzzle.DefineVar(config, "string", &defaultValues.s)
-	puzzle.DefineVar(config, nestedKey("int", "a"), &defaultValues.i)
-	puzzle.DefineVar(config, nestedKey("int8", "a"), &defaultValues.i8)
-	puzzle.DefineVar(config, nestedKey("int16", "a"), &defaultValues.i16)
-	puzzle.DefineVar(config, nestedKey("int32", "b"), &defaultValues.i32)
-	puzzle.DefineVar(config, nestedKey("int64", "b"), &defaultValues.i64)
-	puzzle.DefineVar(config, nestedKey(nestedKey("uint", "c"), "a"), &defaultValues.u)
-	puzzle.DefineVar(config, nestedKey(nestedKey("uint8", "c"), "a"), &defaultValues.u8)
-	puzzle.DefineVar(config, nestedKey(nestedKey("uint16", "d"), "a"), &defaultValues.u16)
-	puzzle.DefineVar(config, nestedKey(nestedKey("uint32", "c"), "b"), &defaultValues.u32)
-	puzzle.DefineVar(config, nestedKey(nestedKey("uint64", "x"), "y"), &defaultValues.u64)
-	puzzle.DefineVar(config, "float32", &defaultValues.f32)
-	puzzle.DefineVar(config, "float64", &defaultValues.f64)
-	puzzle.DefineVar(config, "duration", &defaultValues.d)
-	puzzle.DefineVar(config, "ip", &defaultValues.ip)
-	puzzle.DefineVar(config, "bytes", &defaultValues.bytes, puzzle.WithFormat("base64"))
-	puzzle.DefineVar(config, "string-slice", &defaultValues.ss)
+	puzzle.DefineVar(config, "bool", &defaultValues.B)
+	puzzle.DefineVar(config, "string", &defaultValues.S)
+	puzzle.DefineVar(config, nestedKey("int", "a"), &defaultValues.I)
+	puzzle.DefineVar(config, nestedKey("int8", "a"), &defaultValues.I8)
+	puzzle.DefineVar(config, nestedKey("int16", "a"), &defaultValues.I16)
+	puzzle.DefineVar(config, nestedKey("int32", "b"), &defaultValues.I32)
+	puzzle.DefineVar(config, nestedKey("int64", "b"), &defaultValues.I64)
+	puzzle.DefineVar(config, nestedKey(nestedKey("uint", "c"), "a"), &defaultValues.U)
+	puzzle.DefineVar(config, nestedKey(nestedKey("uint8", "c"), "a"), &defaultValues.U8)
+	puzzle.DefineVar(config, nestedKey(nestedKey("uint16", "d"), "a"), &defaultValues.U16)
+	puzzle.DefineVar(config, nestedKey(nestedKey("uint32", "c"), "b"), &defaultValues.U32)
+	puzzle.DefineVar(config, nestedKey(nestedKey("uint64", "x"), "y"), &defaultValues.U64)
+	puzzle.DefineVar(config, "float32", &defaultValues.F32)
+	puzzle.DefineVar(config, "float64", &defaultValues.F64)
+	puzzle.DefineVar(config, "duration", &defaultValues.D)
+	puzzle.DefineVar(config, "ip", &defaultValues.IP)
+	puzzle.DefineVar(config, "bytes", &defaultValues.Bytes, puzzle.WithFormat("base64"))
+	puzzle.DefineVar(config, "string-slice", &defaultValues.SS)
 
 	return config, defaultValues
 }
@@ -207,75 +137,20 @@ func TestReadJSONRawType(t *testing.T) {
 	}
 }
 
-func compare(initial *allTypes, jsonValues *allTypes, t *testing.T) {
-	if initial.b != jsonValues.b {
-		t.Errorf("expected %v, got %v", jsonValues.b, initial.b)
-	}
-	if initial.s != jsonValues.s {
-		t.Errorf("expected %v, got %v", jsonValues.s, initial.s)
-	}
-	if initial.i != jsonValues.i {
-		t.Errorf("expected %v, got %v", jsonValues.i, initial.i)
-	}
-	if initial.i8 != jsonValues.i8 {
-		t.Errorf("expected %v, got %v", jsonValues.i8, initial.i8)
-	}
-	if initial.i16 != jsonValues.i16 {
-		t.Errorf("expected %v, got %v", jsonValues.i16, initial.i16)
-	}
-	if initial.i32 != jsonValues.i32 {
-		t.Errorf("expected %v, got %v", jsonValues.i32, initial.i32)
-	}
-	if initial.i64 != jsonValues.i64 {
-		t.Errorf("expected %v, got %v", jsonValues.i64, initial.i64)
-	}
-	if initial.u != jsonValues.u {
-		t.Errorf("expected %v, got %v", jsonValues.u, initial.u)
-	}
-	if initial.u8 != jsonValues.u8 {
-		t.Errorf("expected %v, got %v", jsonValues.u8, initial.u8)
-	}
-	if initial.u16 != jsonValues.u16 {
-		t.Errorf("expected %v, got %v", jsonValues.u16, initial.u16)
-	}
-	if initial.u32 != jsonValues.u32 {
-		t.Errorf("expected %v, got %v", jsonValues.u32, initial.u32)
-	}
-	if initial.u64 != jsonValues.u64 {
-		t.Errorf("expected %v, got %v", jsonValues.u64, initial.u64)
-	}
-	if initial.f32 != jsonValues.f32 {
-		t.Errorf("expected %v, got %v", jsonValues.f32, initial.f32)
-	}
-	if initial.f64 != jsonValues.f64 {
-		t.Errorf("expected %v, got %v", jsonValues.f64, initial.f64)
-	}
-	if initial.d != jsonValues.d {
-		t.Errorf("expected %v, got %v", jsonValues.d, initial.d)
-	}
-	if !initial.ip.Equal(jsonValues.ip) {
-		t.Errorf("expected %v, got %v", jsonValues.ip, initial.ip)
-	}
-	if !sliceEqual(initial.bytes, jsonValues.bytes) {
-		t.Errorf("expected %v, got %v", jsonValues.bytes, initial.bytes)
-	}
-	if !sliceEqual(initial.ss, jsonValues.ss) {
-		t.Errorf("expected %v, got %v", jsonValues.ss, initial.ss)
-	}
-}
-
-func testReadJsonRaw(config *puzzle.Config, initial *allTypes, raw []byte, jsonValues *allTypes, t *testing.T) {
+func testReadJsonRaw(config *puzzle.Config, initial *frontendtesting.AllTypes, raw []byte, jsonValues *frontendtesting.AllTypes, t *testing.T) {
 	t.Log(string(raw))
 	if err := ReadJSONRaw(config, raw); err != nil {
 		t.Fatalf("failed to read json: %v", err)
 	}
-	compare(initial, jsonValues, t)
+	if err := initial.Compare(jsonValues); err != nil {
+		t.Error(err)
+	}
 }
 
 func TestReadJSONRaw(t *testing.T) {
 	config, initial := randomConfig()
 	config2, jsonValues := randomConfig()
-	raw, err := toJSON(config2)
+	raw, err := ToJSON(config2)
 	if err != nil {
 		t.Fatalf("failed to marshal json: %v", err)
 	}
@@ -285,7 +160,7 @@ func TestReadJSONRaw(t *testing.T) {
 func TestReadJSONRawNested(t *testing.T) {
 	config, initial := randomNestedConfig()
 	config2, jsonValues := randomNestedConfig()
-	raw, err := toJSON(config2)
+	raw, err := ToJSON(config2)
 	if err != nil {
 		t.Fatalf("failed to marshal json: %v", err)
 	}
@@ -302,7 +177,8 @@ func TestReadJSON(t *testing.T) {
 		t.Fatalf("failed to define config file: %v", err)
 	}
 	config2, jsonValues := randomNestedConfig()
-	raw, err := toJSON(config2)
+	raw, err := ToJSON(config2)
+	t.Log(string(raw))
 	if err != nil {
 		t.Fatalf("failed to marshal json: %v", err)
 	}
@@ -314,7 +190,10 @@ func TestReadJSON(t *testing.T) {
 	if err := ReadJSON(config); err != nil {
 		t.Fatalf("failed to read json: %v", err)
 	}
-	compare(initial, jsonValues, t)
+
+	if err := initial.Compare(jsonValues); err != nil {
+		t.Error(err)
+	}
 }
 
 func TestReadJSONNoFile(t *testing.T) {
