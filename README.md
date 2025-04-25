@@ -105,9 +105,13 @@ Once a config is defined. The goal of **puzzle** is to be able to automatically 
 ### Environment
 
 ```go
-package main 
+package main
 
-import "github.com/asiffer/puzzle"
+import (
+	"fmt"
+
+	"github.com/asiffer/puzzle"
+)
 
 var config = puzzle.NewConfig()
 
@@ -116,18 +120,19 @@ var adminUser string = "me"
 var secret string = "p4$$w0rD"
 
 func init() {
-    puzzle.DefineVar(config, "admin-user", &user) // default env name is set to ADMIN_USER
-    puzzle.DefineVar(config, "count", &counter, puzzle.WithEnvName("N")) // we redefine it to N
-    puzzle.DefineVar(config, "secret", &secret, puzzle.WithoutEnv()) // we disable env for this entry
+	puzzle.DefineVar(config, "admin-user", &adminUser)                   // default env name is set to ADMIN_USER
+	puzzle.DefineVar(config, "count", &counter, puzzle.WithEnvName("N")) // we redefine it to N
+	puzzle.DefineVar(config, "secret", &secret, puzzle.WithoutEnv())     // we disable env for this entry
 }
 
 func main() {
-    // update the config from env
-    if err := puzzle.ReadEnv(config); err != nil {
-        panic(err)
-    }
-    fmt.Println(counter, adminUser, secret)
+	// update the config from env
+	if err := puzzle.ReadEnv(config); err != nil {
+		panic(err)
+	}
+	fmt.Println(counter, adminUser, secret)
 }
+
 ```
 
 ### CLI flags
@@ -138,78 +143,154 @@ The **puzzle** library aims to target the most popular.
 #### `flag`
 
 ```go
-package main 
+package main
 
 import (
-    "github.com/asiffer/puzzle"
-    "github.com/asiffer/puzzle/flagset"
+	"flag"
+	"fmt"
+	"os"
+
+	"github.com/asiffer/puzzle"
+	"github.com/asiffer/puzzle/flagset"
 )
 
 var config = puzzle.NewConfig()
 
-var counter uint64 = 0
+var counter uint64 = 1
 var adminUser string = "me"
 var secret string = "p4$$w0rD"
 
 func init() {
-    puzzle.DefineVar(config, "admin-user", &user) // default flag is set to -admin-user
-    puzzle.DefineVar(config, "count", &counter, puzzle.WithFlagName("number")) // we redefine it to -number
-    puzzle.DefineVar(config, "secret", &secret, puzzle.WithoutFlagName()) // we disable flag for this entry
+	puzzle.DefineVar(config, "admin-user", &adminUser)                         // default flag is set to -admin-user
+	puzzle.DefineVar(config, "count", &counter, puzzle.WithFlagName("number")) // we redefine it to -number
+	puzzle.DefineVar(config, "secret", &secret, puzzle.WithoutFlagName())      // we disable flag for this entry
 }
 
 func main() {
-    fs, err := flagset.Build(config, "myApp", pflag.ContinueOnError)
-    if err != nil {
-        panic(err)
-    }
-    
-    // all the config is updated when args are parsed
-    if err := fs.Parse(os.Args); err != nil {
-        panic(err)
-    }
+	fs, err := flagset.Build(config, "myApp", flag.ContinueOnError)
+	if err != nil {
+		panic(err)
+	}
 
-    fmt.Println(counter, adminUser, secret)
+	// all the config is updated when args are parsed
+	if err := fs.Parse(os.Args[1:]); err != nil {
+		panic(err)
+	}
+
+	fmt.Println(counter, adminUser, secret)
 }
+
 ```
+
+
 
 #### `spf13/pflag`
 
 ```go
-// generate a *pflag.FlagSet
-fs, err := config.PFlagSet("myApp", pflag.ContinueOnError)
-if err != nil {
-    panic(err)
+package main
+
+import (
+	"fmt"
+	"os"
+
+	"github.com/asiffer/puzzle"
+	"github.com/asiffer/puzzle/pflagset"
+	"github.com/spf13/pflag"
+)
+
+var config = puzzle.NewConfig()
+
+var counter uint64 = 1
+var adminUser string = "me"
+var secret string = "p4$$w0rD"
+var verbose = false
+
+func init() {
+	puzzle.DefineVar(config, "admin-user", &adminUser)                           // default flag is set to -admin-user
+	puzzle.DefineVar(config, "count", &counter, puzzle.WithFlagName("number"))   // we redefine it to -number
+	puzzle.DefineVar(config, "secret", &secret, puzzle.WithoutFlagName())        // we disable flag for this entry
+	puzzle.DefineVar(config, "verbose", &verbose, puzzle.WithShortFlagName("v")) // you can use -v
 }
-// all the config is updated when args are parsed
-if err := fs.Parse(os.Args); err != nil {
-    panic(err)
+
+func main() {
+	fs, err := pflagset.Build(config, "myApp", pflag.ContinueOnError)
+	if err != nil {
+		panic(err)
+	}
+
+	// all the config is updated when args are parsed
+	if err := fs.Parse(os.Args[1:]); err != nil {
+		panic(err)
+	}
+
+	fmt.Println(counter, adminUser, secret, verbose)
 }
+
 ```
+
+#### `spf13/cobra` 
+
+```go
+package main
+
+import (
+	"fmt"
+
+	"github.com/asiffer/puzzle"
+	"github.com/asiffer/puzzle/pflagset"
+	"github.com/spf13/cobra"
+)
+
+var config = puzzle.NewConfig()
+
+var counter uint64 = 1
+var adminUser string = "me"
+var secret string = "p4$$w0rD"
+var verbose = false
+
+var rootCmd = &cobra.Command{
+	Use:   "puzzle-cobra",
+	Short: "A example of binding puzzle and spf13/cobra",
+	Run: func(cmd *cobra.Command, args []string) {
+		// Do Stuff Here
+		fmt.Println(counter, adminUser, secret, verbose)
+	},
+}
+
+func init() {
+	puzzle.DefineVar(config, "admin-user", &adminUser)                           // default flag is set to -admin-user
+	puzzle.DefineVar(config, "count", &counter, puzzle.WithFlagName("number"))   // we redefine it to -number
+	puzzle.DefineVar(config, "secret", &secret, puzzle.WithoutFlagName())        // we disable flag for this entry
+	puzzle.DefineVar(config, "verbose", &verbose, puzzle.WithShortFlagName("v")) // you can use -v
+}
+
+func main() {
+	pflagset.Populate(config, rootCmd.Flags()) // here is the magic
+	if err := rootCmd.Execute(); err != nil {
+		panic(err)
+	}
+}
+
+```
+
 
 ### `urfave/cli (v3)`
 
 ```go
-// generate a []cli.Flag
-flags, err := config.Urfave3()
-if err != nil {
-    panic(err)
-}
-// all the config will be updated at cmd.Run(...)
-cmd := &cli.Command{ 
-    Name: "myApp"
-    Flags: flags,
-}
+// TODO
 ```
 
 
 ### JSON file
 
 ```go
-package main 
+package main
 
 import (
-    "github.com/asiffer/puzzle"
-    "github.com/asiffer/puzzle/jsonfile"
+	"fmt"
+
+	"github.com/asiffer/puzzle"
+	"github.com/asiffer/puzzle/jsonfile"
 )
 
 var config = puzzle.NewConfig()
@@ -219,21 +300,22 @@ var adminUser string = "me"
 var secret string = "p4$$w0rD"
 
 func init() {
-    puzzle.DefineConfigFile(config, "config", []string{"conf.json"})
-    puzzle.DefineVar(config, "admin-user", &user) // we directly use the key to read the json
-    puzzle.DefineVar(config, "count", &counter) 
-    puzzle.DefineVar(config, "secret", &secret) 
+	puzzle.DefineConfigFile(config, "config", []string{"config.json"})
+	puzzle.DefineVar(config, "admin-user", &adminUser) // we directly use the key to read the json
+	puzzle.DefineVar(config, "count", &counter)
+	puzzle.DefineVar(config, "secret", &secret)
 }
 
 func main() {
-    if err := jsonfile.ReadJSON(config); err != nil {
-        // /!\ if it fails during parsing the json file the config can be corrupted
-        // (only some values are updated)
-        panic(err)
-    }
-    // all the config is updated 
-    fmt.Println(counter, adminUser, secret)
+	if err := jsonfile.ReadJSON(config); err != nil {
+		// /!\ if it fails during parsing the json file the config can be corrupted
+		// (only some values are updated)
+		panic(err)
+	}
+	// all the config is updated
+	fmt.Println(counter, adminUser, secret)
 }
+
 ```
 
 
