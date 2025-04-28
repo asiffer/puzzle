@@ -1,5 +1,7 @@
 package puzzle
 
+import "fmt"
+
 type ConfigFilter func(key string) bool
 
 const DEFAULT_NESTING_SEPARATOR = "."
@@ -86,4 +88,32 @@ func (config *Config) Only(keys ...string) *Config {
 			},
 		),
 	}
+}
+
+func (config *Config) ToFlags(useShort bool) []string {
+	out := make([]string, 0)
+	for _, e := range config.entries {
+		fn := e.GetMetadata().FlagName
+		sfn := e.GetMetadata().ShortFlagName
+		if fn == "" {
+			continue
+		}
+
+		if useShort && sfn != "" {
+			switch b := e.GetValue().(type) {
+			case bool:
+				if b {
+					out = append(out, "-"+sfn)
+				} else {
+					// falbback to long flag
+					out = append(out, fmt.Sprintf("--%s=%s", fn, e.String()))
+				}
+			default:
+				out = append(out, "-"+sfn, e.String())
+			}
+		} else {
+			out = append(out, fmt.Sprintf("--%s=%s", fn, e.String()))
+		}
+	}
+	return out
 }

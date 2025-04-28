@@ -134,6 +134,7 @@ func (e *Entry[T]) Type() string {
 	return fmt.Sprintf("%T", e.Value)
 }
 
+// Method to be compatible with urfave/cli.Value interface
 func (e *Entry[T]) Get() interface{} {
 	return e.GetValue()
 }

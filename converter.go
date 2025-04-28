@@ -13,9 +13,10 @@ type Converter[T any] interface {
 
 type ConvertCallback[T any] func(entry *Entry[T], args ...interface{}) error
 
+// ConvertCallbackFactory1 is a function that turns a specific 1-argument function into a generic ConvertCallback
 func ConvertCallbackFactory1[T any, A any](fun func(entry *Entry[T], arg A) error) ConvertCallback[T] {
 	return func(entry *Entry[T], args ...interface{}) error {
-		var t T
+		var t A
 		if len(args) < 1 {
 			return fmt.Errorf("an argument of type %T is required", t)
 		}
@@ -28,6 +29,31 @@ func ConvertCallbackFactory1[T any, A any](fun func(entry *Entry[T], arg A) erro
 		default:
 			return fmt.Errorf("expected an argument of type %T, got %v (%T)", t, a, a)
 		}
+	}
+}
+
+// ConvertCallbackFactory2 is a function that turns a specific 2-argument function into a generic ConvertCallback
+func ConvertCallbackFactory2[T any, A any, B any](fun func(entry *Entry[T], arg0 A, arg1 B) error) ConvertCallback[T] {
+	return func(entry *Entry[T], args ...interface{}) error {
+		var t0 A
+		var t1 B
+		if len(args) < 2 {
+			return fmt.Errorf("an argument of type %T and an argument of type %T are required", t0, t1)
+		}
+		if len(args) > 2 {
+			return fmt.Errorf("too many arguments provided, only an argument of type %T and an argument of type %T are required", t0, t1)
+		}
+
+		if a, ok := args[0].(A); ok {
+			if b, ok := args[1].(B); ok {
+				return fun(entry, a, b)
+			} else {
+				return fmt.Errorf("expected an argument of type %T, got %v (%T)", t1, args[1], args[1])
+			}
+		} else {
+			return fmt.Errorf("expected an argument of type %T, got %v (%T)", t0, args[0], args[0])
+		}
+
 	}
 }
 
