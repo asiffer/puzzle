@@ -7,6 +7,7 @@
 </p>
 
 
+
 ## Introduction
 
 **All we need is configuration**. Yes we also need commands, flags, env variables, config files... but they are just *frontends*. Why should we create configuration from command flags? And not the opposite?
@@ -19,6 +20,30 @@
 ![GitHub License](https://img.shields.io/github/license/asiffer/puzzle)
 ![Library base size](https://img.shields.io/badge/size-435_KB-green)
 [![codecov](https://codecov.io/github/asiffer/puzzle/graph/badge.svg?token=7R7S74GVRF)](https://codecov.io/github/asiffer/puzzle)
+
+- [Introduction](#introduction)
+- [Install](#install)
+- [Get started](#get-started)
+- [Frontends](#frontends)
+	- [Environment](#environment)
+	- [CLI flags](#cli-flags)
+		- [`flag`](#flag)
+		- [`spf13/pflag`](#spf13pflag)
+		- [`spf13/cobra`](#spf13cobra)
+		- [`urfave/cli/v3`](#urfavecliv3)
+	- [JSON file](#json-file)
+- [Customizations](#customizations)
+- [Patterns](#patterns)
+	- [Helpers (DX)](#helpers-dx)
+	- [Config struct](#config-struct)
+	- [Config file](#config-file)
+		- [Configurable config file](#configurable-config-file)
+		- [Hardcoded config file](#hardcoded-config-file)
+- [Supported types](#supported-types)
+- [Developer](#developer)
+	- [Supporting a new type](#supporting-a-new-type)
+	- [Supporting a new frontend](#supporting-a-new-frontend)
+
 
 ## Install
 
