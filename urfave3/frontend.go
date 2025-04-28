@@ -10,6 +10,8 @@ const Urfave3Frontend puzzle.Frontend = "urfave3"
 
 type FB[T any] cli.FlagBase[T, interface{}, cli.ValueCreator[T, interface{}]]
 
+// EntryCreator is a special types that implements the cli.ValueCreator interface
+// Its jobs is to bind between our puzzle.Entry and the cli.Value
 type EntryCreator[T any] struct{}
 
 func (ec EntryCreator[T]) Create(v T, p *T, c *puzzle.Entry[T]) cli.Value {
@@ -24,8 +26,11 @@ func (ec EntryCreator[T]) ToString(v T) string {
 	return e.String()
 }
 
+type FlagBaseSubsetOption func(f *FlagBaseSubset)
+
 // FlagBaseSubset is a subset of the FlagBase struct that contains only the fields
-// outside of the generic ones
+// outside of the generic ones. It is used to tweak some urfave3 options that are not
+// available when defining a new variable.
 type FlagBaseSubset struct {
 	Name             *string
 	Category         *string
@@ -36,29 +41,29 @@ type FlagBaseSubset struct {
 	Required         *bool
 	Hidden           *bool
 	Local            *bool
-	Aliases          []string
+	Aliases          *[]string
 	TakesFile        *bool
 	OnlyOnce         *bool
 	ValidateDefaults *bool
 }
 
-// func exposeFlagBaseSubset[T any](f *cli.FlagBase[T, interface{}, EntryCreator[T]]) *FlagBaseSubset {
-// 	return &FlagBaseSubset{
-// 		Name:             &f.Name,
-// 		Category:         &f.Category,
-// 		DefaultText:      &f.DefaultText,
-// 		HideDefault:      &f.HideDefault,
-// 		Usage:            &f.Usage,
-// 		Sources:          &f.Sources,
-// 		Required:         &f.Required,
-// 		Hidden:           &f.Hidden,
-// 		Local:            &f.Local,
-// 		Aliases:          f.Aliases,
-// 		TakesFile:        &f.TakesFile,
-// 		OnlyOnce:         &f.OnlyOnce,
-// 		ValidateDefaults: &f.ValidateDefaults,
-// 	}
-// }
+func exposeFlagBaseSubset[T any](f *cli.FlagBase[T, *puzzle.Entry[T], EntryCreator[T]]) *FlagBaseSubset {
+	return &FlagBaseSubset{
+		Name:             &f.Name,
+		Category:         &f.Category,
+		DefaultText:      &f.DefaultText,
+		HideDefault:      &f.HideDefault,
+		Usage:            &f.Usage,
+		Sources:          &f.Sources,
+		Required:         &f.Required,
+		Hidden:           &f.Hidden,
+		Local:            &f.Local,
+		Aliases:          &f.Aliases,
+		TakesFile:        &f.TakesFile,
+		OnlyOnce:         &f.OnlyOnce,
+		ValidateDefaults: &f.ValidateDefaults,
+	}
+}
 
 func defaultFlagBase[T any](entry *puzzle.Entry[T]) *cli.FlagBase[T, *puzzle.Entry[T], EntryCreator[T]] {
 	f := cli.FlagBase[T, *puzzle.Entry[T], EntryCreator[T]]{
@@ -81,14 +86,14 @@ func defaultFlagBase[T any](entry *puzzle.Entry[T]) *cli.FlagBase[T, *puzzle.Ent
 	return &f
 }
 
-func Build(c *puzzle.Config) ([]cli.Flag, error) {
+func Build(c *puzzle.Config, options ...FlagBaseSubsetOption) ([]cli.Flag, error) {
 	flags := make([]cli.Flag, 0)
-	return flags, Populate(c, &flags)
+	return flags, Populate(c, &flags, options...)
 }
 
-func Populate(c *puzzle.Config, flags *[]cli.Flag) error {
+func Populate(c *puzzle.Config, flags *[]cli.Flag, options ...FlagBaseSubsetOption) error {
 	for entry := range c.Entries() {
-		if err := entry.Convert(Urfave3Frontend, flags); err != nil {
+		if err := entry.Convert(Urfave3Frontend, flags, options); err != nil {
 			return err
 		}
 	}
