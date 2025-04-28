@@ -42,3 +42,15 @@ func TestFlagName(t *testing.T) {
 		}
 	}
 }
+
+func TestString(t *testing.T) {
+	c, _ := randomConfig()
+	for _, e := range c.entries {
+		s0 := e.String()
+		e.Set(s0)
+		s1 := e.String()
+		if s0 != s1 {
+			t.Errorf("Expected %s, got %s", s0, s1)
+		}
+	}
+}

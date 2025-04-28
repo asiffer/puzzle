@@ -80,7 +80,7 @@ func testBuild(t *testing.T, i int) {
 	if err != nil {
 		t.Fatalf("error building flagset: %v", err)
 	}
-	if err := fs.Parse(ToFlags(config2)); err != nil {
+	if err := fs.Parse(config2.ToFlags(false)); err != nil {
 		t.Fatalf("error parsing flags: %v", err)
 	}
 
@@ -98,7 +98,7 @@ func testBuildNested(t *testing.T, i int) {
 	if err != nil {
 		t.Fatalf("error building flagset: %v", err)
 	}
-	if err := fs.Parse(ToFlags(config2)); err != nil {
+	if err := fs.Parse(config2.ToFlags(false)); err != nil {
 		t.Fatalf("error parsing flags: %v", err)
 	}
 
