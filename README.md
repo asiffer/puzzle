@@ -17,7 +17,7 @@
 [![Test](https://github.com/asiffer/puzzle/actions/workflows/test.yml/badge.svg)](https://github.com/asiffer/puzzle/actions/workflows/test.yml) 
 [![Go Reference](https://pkg.go.dev/badge/github.com/asiffer/puzzle.svg)](https://pkg.go.dev/github.com/asiffer/puzzle)
 ![GitHub License](https://img.shields.io/github/license/asiffer/puzzle)
-![Library base size](https://img.shields.io/badge/size-382_KB-green)
+![Library base size](https://img.shields.io/badge/size-435_KB-green)
 [![codecov](https://codecov.io/github/asiffer/puzzle/graph/badge.svg?token=7R7S74GVRF)](https://codecov.io/github/asiffer/puzzle)
 
 ## Install

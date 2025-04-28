@@ -11,7 +11,7 @@ type EntryMetadata struct {
 	ShortFlagName  string
 	EnvName        string
 	Format         string
-	SliceSeparator string
+	SliceSeparator rune
 	IsConfigFile   bool
 }
 
@@ -45,7 +45,7 @@ func newMetadataFromEntry(key string) *EntryMetadata {
 		ShortFlagName:  "",
 		EnvName:        GenerateEnvName(key),
 		Format:         "",
-		SliceSeparator: ",",
+		SliceSeparator: ',',
 		IsConfigFile:   false,
 	}
 }
@@ -82,7 +82,7 @@ func WithShortFlagName(name string) MetadataOption {
 	}
 }
 
-func WithSliceSeparator(sep string) MetadataOption {
+func WithSliceSeparator(sep rune) MetadataOption {
 	return func(metadata *EntryMetadata) {
 		metadata.SliceSeparator = sep
 	}

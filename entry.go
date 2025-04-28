@@ -3,8 +3,10 @@ package puzzle
 import (
 	"encoding/base32"
 	"encoding/base64"
+	"encoding/csv"
 	"encoding/hex"
 	"fmt"
+	"io"
 	"net"
 	"strings"
 	"time"
@@ -105,7 +107,11 @@ func (e *Entry[T]) String() string {
 	case net.IP:
 		return v.String()
 	case []string:
-		return strings.Join(v, e.Metadata.SliceSeparator)
+		var out strings.Builder
+		w := e.csvWriter(&out)
+		w.Write(v)
+		w.Flush()
+		return out.String()
 	case []byte:
 		switch e.Metadata.Format {
 		case "base32":
@@ -137,4 +143,16 @@ func (e *Entry[T]) Type() string {
 // Method to be compatible with urfave/cli.Value interface
 func (e *Entry[T]) Get() interface{} {
 	return e.GetValue()
+}
+
+func (e *Entry[T]) csvReader(r io.Reader) *csv.Reader {
+	reader := csv.NewReader(r)
+	reader.Comma = e.Metadata.SliceSeparator
+	return reader
+}
+
+func (e *Entry[T]) csvWriter(w io.Writer) *csv.Writer {
+	writer := csv.NewWriter(w)
+	writer.Comma = e.Metadata.SliceSeparator
+	return writer
 }

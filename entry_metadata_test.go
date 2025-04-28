@@ -8,7 +8,7 @@ func TestOptions(t *testing.T) {
 	DefineVar(config, "test", &x,
 		WithEnvName("TEST"),
 		WithDescription("a test option"),
-		WithSliceSeparator("|"),
+		WithSliceSeparator('|'),
 		WithFormat("???"),
 		WithFlagName("test"),
 		WithShortFlagName("t"),
