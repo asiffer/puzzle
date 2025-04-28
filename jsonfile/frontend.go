@@ -2,6 +2,7 @@ package jsonfile
 
 import (
 	"bytes"
+	"encoding/csv"
 	"encoding/json"
 	"fmt"
 	"os"
@@ -29,12 +30,20 @@ func recursiveJSON(config *puzzle.Config, data interface{}, prefix string, out m
 			return fmt.Errorf("key %s is not accepted by the configuration", prefix)
 		}
 
-		ssep := entry.GetMetadata().SliceSeparator
-		tmp := ""
-		for _, v := range val {
-			tmp += fmt.Sprintf("%v%s", v, ssep)
+		sb := strings.Builder{}
+
+		writer := csv.NewWriter(&sb)
+		writer.Comma = entry.GetMetadata().SliceSeparator
+		record := make([]string, len(val))
+		for i, v := range val {
+			record[i] = fmt.Sprintf("%v", v)
 		}
-		out[prefix] = strings.TrimSuffix(tmp, ssep)
+		if err := writer.Write(record); err != nil {
+			return err
+		} else {
+			writer.Flush()
+			out[prefix] = sb.String()
+		}
 		return nil
 	default:
 		_, exists := config.GetEntry(prefix)
