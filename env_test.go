@@ -81,6 +81,8 @@ func testEnv(t *testing.T, i int) {
 			value = fmt.Sprintf("%v", envValues.d)
 		case net.IP:
 			value = envValues.ip.String()
+		case []string:
+			value = strings.Join(envValues.ss, ",")
 		case []byte:
 			value = hex.EncodeToString(envValues.bytes)
 		default:

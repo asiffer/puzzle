@@ -54,3 +54,19 @@ func TestString(t *testing.T) {
 		}
 	}
 }
+
+func TestSetWithBadInput(t *testing.T) {
+	bad := "b4d"
+	c, _ := randomConfig()
+	for _, e := range c.entries {
+		switch any(e.GetValue()).(type) {
+		case string, []string:
+			continue
+		default:
+			if err := e.Set(bad); err == nil {
+				t.Errorf("Expected error, got nil")
+			}
+		}
+
+	}
+}

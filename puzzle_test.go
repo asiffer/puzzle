@@ -30,6 +30,7 @@ type allTypes struct {
 	d     time.Duration
 	ip    net.IP
 	bytes []byte
+	ss    []string
 }
 
 func randomValues() *allTypes {
@@ -55,6 +56,7 @@ func randomValues() *allTypes {
 		d:     time.Duration(gofakeit.Int64()),
 		ip:    net.ParseIP(gofakeit.IPv4Address()),
 		bytes: b,
+		ss:    []string{gofakeit.Word(), gofakeit.Word(), gofakeit.Word()},
 	}
 }
 
@@ -79,6 +81,7 @@ func randomConfig() (*Config, *allTypes) {
 	DefineVar(config, "duration", &defaultValues.d)
 	DefineVar(config, "ip", &defaultValues.ip)
 	DefineVar(config, "bytes", &defaultValues.bytes)
+	DefineVar(config, "string-slice", &defaultValues.ss)
 
 	return config, defaultValues
 }
