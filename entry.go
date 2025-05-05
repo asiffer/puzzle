@@ -101,6 +101,10 @@ func (e *Entry[T]) GetMetadata() *EntryMetadata {
 
 // Method to be compatible with flag.Value interface (and spf13/pflag.Value interface)
 func (e *Entry[T]) String() string {
+	// possible issue with flag package. See https://pkg.go.dev/flag#Value
+	if e == nil || e.ValueP == nil {
+		return ""
+	}
 	switch v := any(*e.ValueP).(type) {
 	case time.Duration:
 		return v.String()
