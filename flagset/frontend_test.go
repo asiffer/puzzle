@@ -94,8 +94,8 @@ func testBuildNested(t *testing.T, i int) {
 	config, initial := randomNestedConfig()
 	config2, values := randomNestedConfig()
 
-	fs, err := Build(config, "test", flag.PanicOnError)
-	if err != nil {
+	fs := flag.NewFlagSet("test", flag.PanicOnError)
+	if err := Populate(config, fs); err != nil {
 		t.Fatalf("error building flagset: %v", err)
 	}
 	if err := fs.Parse(config2.ToFlags(false)); err != nil {

@@ -39,6 +39,7 @@
 	- [Config file](#config-file)
 		- [Configurable config file](#configurable-config-file)
 		- [Hardcoded config file](#hardcoded-config-file)
+	- [Separation of concerns](#separation-of-concerns)
 - [Supported types](#supported-types)
 - [Developer](#developer)
 	- [Supporting a new type](#supporting-a-new-type)
@@ -422,6 +423,7 @@ In the case where we have a single config, we can create wrappers to ease config
 // config/config.go
 package config
 
+// the configuration is hidden from other packages
 var konf = puzzle.NewConfig()
 
 func Define[T any](key string, defaultValue T, options ...puzzle.MetadataOption) error {
@@ -544,8 +546,24 @@ func main() {
 ```
 
 
+### Separation of concerns
+
+Sometimes, we do not have a single config, it is rather a _puzzle_. Obviously, everything can be put in the same `puzzle.Config` structure but we can also manage several configs.
+
+```go
+var (
+	ConfigFrontend = puzzle.NewConfig()
+	ConfigBackend = puzzle.NewConfig()
+)
+```
+
+It may be relevant when they are likely to be populated at a different moment, or from a different frontend.
+
 
 ## Supported types
+
+> [!CAUTION]
+> `puzzle` panics if we try to define an unsupported type variable
 
 | Type            | Supported          |
 | --------------- | ------------------ |
