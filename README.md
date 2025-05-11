@@ -2,11 +2,6 @@
     <img src="https://raw.githubusercontent.com/asiffer/puzzle/master/assets/banner.png" width="100%" alt="asiffer/puzzle">
 </p>
 
-<p align="center">
-    <b>puzzle - Bottom-up golang configuration library</b>
-</p>
-
-
 
 ## Introduction
 
