@@ -61,7 +61,7 @@ func randomConfigWithShort() (*puzzle.Config, *frontendtesting.AllTypes) {
 	return config, defaultValues
 }
 
-func testBuild(
+func baseTestBuild(
 	config *puzzle.Config,
 	config2 *puzzle.Config,
 	values *frontendtesting.AllTypes,
@@ -79,22 +79,36 @@ func testBuild(
 	return values.Compare(values2)
 }
 
-func TestBuild(t *testing.T) {
-	gofakeit.Seed(0)
+func testBuild(t *testing.T, i int) {
+	gofakeit.Seed(i)
 	config, initial := randomConfig()
 	config2, values := randomConfig()
 
-	if err := testBuild(config, config2, initial, values, false); err != nil {
+	if err := baseTestBuild(config, config2, initial, values, false); err != nil {
 		t.Fatalf("error building flagset: %v", err)
 	}
 }
 
-func TestBuildShort(t *testing.T) {
-	gofakeit.Seed(0)
+func testBuildShort(t *testing.T, i int) {
+	gofakeit.Seed(i)
 	config, initial := randomConfigWithShort()
 	config2, values := randomConfigWithShort()
 
-	if err := testBuild(config, config2, initial, values, true); err != nil {
+	if err := baseTestBuild(config, config2, initial, values, true); err != nil {
 		t.Fatalf("error building flagset: %v", err)
 	}
+}
+
+func FuzzBuild(f *testing.F) {
+	for i := range 200 {
+		f.Add(i)
+	}
+	f.Fuzz(testBuild)
+}
+
+func FuzzBuildShort(f *testing.F) {
+	for i := range 200 {
+		f.Add(i)
+	}
+	f.Fuzz(testBuildShort)
 }

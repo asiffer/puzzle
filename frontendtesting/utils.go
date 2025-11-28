@@ -6,6 +6,7 @@ import (
 	"net"
 	"time"
 
+	"github.com/asiffer/puzzle"
 	"github.com/brianvoe/gofakeit/v7"
 )
 
@@ -134,4 +135,89 @@ func (initial *AllTypes) Compare(other *AllTypes) error {
 		return fmt.Errorf("expected %v, got %v", other.SS, initial.SS)
 	}
 	return nil
+}
+
+func NestedKey(key string, prefix string) string {
+	if len(key) == 0 {
+		return key
+	}
+	return fmt.Sprintf("%s%s%s", prefix, puzzle.DEFAULT_NESTING_SEPARATOR, key)
+}
+
+func RandomConfig() (*puzzle.Config, *AllTypes) {
+	config := puzzle.NewConfig()
+	defaultValues := RandomValues()
+
+	puzzle.DefineVar(config, "bool", &defaultValues.B)
+	puzzle.DefineVar(config, "string", &defaultValues.S)
+	puzzle.DefineVar(config, "int", &defaultValues.I)
+	puzzle.DefineVar(config, "int8", &defaultValues.I8)
+	puzzle.DefineVar(config, "int16", &defaultValues.I16)
+	puzzle.DefineVar(config, "int32", &defaultValues.I32)
+	puzzle.DefineVar(config, "int64", &defaultValues.I64)
+	puzzle.DefineVar(config, "uint", &defaultValues.U)
+	puzzle.DefineVar(config, "uint8", &defaultValues.U8)
+	puzzle.DefineVar(config, "uint16", &defaultValues.U16)
+	puzzle.DefineVar(config, "uint32", &defaultValues.U32)
+	puzzle.DefineVar(config, "uint64", &defaultValues.U64)
+	puzzle.DefineVar(config, "float32", &defaultValues.F32)
+	puzzle.DefineVar(config, "float64", &defaultValues.F64)
+	puzzle.DefineVar(config, "duration", &defaultValues.D)
+	puzzle.DefineVar(config, "ip", &defaultValues.IP)
+	puzzle.DefineVar(config, "bytes", &defaultValues.Bytes, puzzle.WithFormat("base64"))
+	puzzle.DefineVar(config, "string-slice", &defaultValues.SS)
+
+	return config, defaultValues
+}
+
+func RandomNestedConfig() (*puzzle.Config, *AllTypes) {
+	config := puzzle.NewConfig()
+	defaultValues := RandomValues()
+
+	puzzle.DefineVar(config, "bool", &defaultValues.B)
+	puzzle.DefineVar(config, "string", &defaultValues.S)
+	puzzle.DefineVar(config, NestedKey("int", "a"), &defaultValues.I)
+	puzzle.DefineVar(config, NestedKey("int8", "a"), &defaultValues.I8)
+	puzzle.DefineVar(config, NestedKey("int16", "a"), &defaultValues.I16)
+	puzzle.DefineVar(config, NestedKey("int32", "b"), &defaultValues.I32)
+	puzzle.DefineVar(config, NestedKey("int64", "b"), &defaultValues.I64)
+	puzzle.DefineVar(config, NestedKey(NestedKey("uint", "c"), "a"), &defaultValues.U)
+	puzzle.DefineVar(config, NestedKey(NestedKey("uint8", "c"), "a"), &defaultValues.U8)
+	puzzle.DefineVar(config, NestedKey(NestedKey("uint16", "d"), "a"), &defaultValues.U16)
+	puzzle.DefineVar(config, NestedKey(NestedKey("uint32", "c"), "b"), &defaultValues.U32)
+	puzzle.DefineVar(config, NestedKey(NestedKey("uint64", "x"), "y"), &defaultValues.U64)
+	puzzle.DefineVar(config, "float32", &defaultValues.F32)
+	puzzle.DefineVar(config, "float64", &defaultValues.F64)
+	puzzle.DefineVar(config, "duration", &defaultValues.D)
+	puzzle.DefineVar(config, "ip", &defaultValues.IP)
+	puzzle.DefineVar(config, "bytes", &defaultValues.Bytes, puzzle.WithFormat("base64"))
+	puzzle.DefineVar(config, "string-slice", &defaultValues.SS)
+
+	return config, defaultValues
+}
+
+func RandomConfigWithShort() (*puzzle.Config, *AllTypes) {
+	config := puzzle.NewConfig()
+	defaultValues := RandomValues()
+
+	puzzle.DefineVar(config, "bool", &defaultValues.B, puzzle.WithShortFlagName("b"))
+	puzzle.DefineVar(config, "string", &defaultValues.S, puzzle.WithShortFlagName("c"))
+	puzzle.DefineVar(config, "int", &defaultValues.I, puzzle.WithShortFlagName("i"))
+	puzzle.DefineVar(config, "int8", &defaultValues.I8, puzzle.WithShortFlagName("j"))
+	puzzle.DefineVar(config, "int16", &defaultValues.I16, puzzle.WithShortFlagName("k"))
+	puzzle.DefineVar(config, "int32", &defaultValues.I32, puzzle.WithShortFlagName("l"))
+	puzzle.DefineVar(config, "int64", &defaultValues.I64, puzzle.WithShortFlagName("m"))
+	puzzle.DefineVar(config, "uint", &defaultValues.U, puzzle.WithShortFlagName("n"))
+	puzzle.DefineVar(config, "uint8", &defaultValues.U8, puzzle.WithShortFlagName("o"))
+	puzzle.DefineVar(config, "uint16", &defaultValues.U16, puzzle.WithShortFlagName("p"))
+	puzzle.DefineVar(config, "uint32", &defaultValues.U32, puzzle.WithShortFlagName("q"))
+	puzzle.DefineVar(config, "uint64", &defaultValues.U64, puzzle.WithShortFlagName("r"))
+	puzzle.DefineVar(config, "float32", &defaultValues.F32, puzzle.WithShortFlagName("s"))
+	puzzle.DefineVar(config, "float64", &defaultValues.F64, puzzle.WithShortFlagName("t"))
+	puzzle.DefineVar(config, "duration", &defaultValues.D, puzzle.WithShortFlagName("d"))
+	puzzle.DefineVar(config, "ip", &defaultValues.IP, puzzle.WithShortFlagName("e"))
+	puzzle.DefineVar(config, "bytes", &defaultValues.Bytes, puzzle.WithFormat("base64"), puzzle.WithShortFlagName("f"))
+	puzzle.DefineVar(config, "string-slice", &defaultValues.SS, puzzle.WithShortFlagName("g"))
+
+	return config, defaultValues
 }
