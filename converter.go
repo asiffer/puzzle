@@ -23,12 +23,12 @@ func ConvertCallbackFactory1[T any, A any](fun func(entry *Entry[T], arg A) erro
 		if len(args) > 1 {
 			return fmt.Errorf("too many arguments provided, only an argument of type %T is required", t)
 		}
-		switch a := args[0].(type) {
-		case A:
-			return fun(entry, a)
-		default:
-			return fmt.Errorf("expected an argument of type %T, got %v (%T)", t, a, a)
+
+		a, ok := args[0].(A)
+		if ok {
+			return fun(entry, A(a))
 		}
+		return fmt.Errorf("[ConvertCallbackFactory1] expected an argument of type %T, got %v (%T)", t, args[0], args[0])
 	}
 }
 
@@ -53,7 +53,6 @@ func ConvertCallbackFactory2[T any, A any, B any](fun func(entry *Entry[T], arg0
 		} else {
 			return fmt.Errorf("expected an argument of type %T, got %v (%T)", t0, args[0], args[0])
 		}
-
 	}
 }
 
@@ -71,6 +70,7 @@ func newConverter[T any](fun func(entry *Entry[T], arg string) error) Converter[
 	}
 }
 
+// Register registers a new frontend
 func (c *converter[T]) Register(name Frontend, callback ConvertCallback[T]) error {
 	_, exists := c.frontends[name]
 	if exists {
@@ -80,6 +80,7 @@ func (c *converter[T]) Register(name Frontend, callback ConvertCallback[T]) erro
 	return nil
 }
 
+// Convert calls the specific frontend on a given entry
 func (c *converter[T]) Convert(name Frontend, entry *Entry[T], args ...any) error {
 	callback, exists := c.frontends[name]
 	if !exists {
