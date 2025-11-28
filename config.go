@@ -1,6 +1,9 @@
 package puzzle
 
-import "fmt"
+import (
+	"fmt"
+	"slices"
+)
 
 type ConfigFilter func(key string) bool
 
@@ -12,6 +15,7 @@ type Config struct {
 	NestingSeparator string
 	entries          map[string]EntryInterface
 	filters          []ConfigFilter
+	order            []string
 }
 
 // NewConfig inits a new config object
@@ -20,9 +24,44 @@ func NewConfig() *Config {
 		NestingSeparator: DEFAULT_NESTING_SEPARATOR,
 		entries:          make(map[string]EntryInterface),
 		filters:          make([]ConfigFilter, 0),
+		order:            nil,
 	}
 }
 
+func (config *Config) orderIfNotProvided() {
+	if config.order != nil {
+		return
+	}
+
+	config.order = make([]string, 0, len(config.entries))
+	for key := range config.entries {
+		config.order = append(config.order, key)
+	}
+}
+
+// Sort sorts the entries of the config by their keys in alphabetical order
+func (config *Config) Sort() {
+	config.order = make([]string, 0, len(config.entries))
+	for key := range config.entries {
+		config.order = append(config.order, key)
+	}
+	slices.Sort(config.order)
+}
+
+// SortFunc allows to sort the entries of the config using a custom function
+// The function should take a slice of strings (the keys) and return a sorted slice of strings
+// even if it is sorted in-place.
+// This function can be run after a previous sort
+func (config *Config) SortFunc(fun func([]string) []string) {
+	config.orderIfNotProvided()
+	// clone the order to avoid modifying the original
+	cpy := make([]string, len(config.order))
+	copy(cpy, config.order)
+	// assign the new order
+	config.order = fun(cpy)
+}
+
+// Accept checks if the key is accepted by all filters
 func (config *Config) Accept(key string) bool {
 	for _, accept := range config.filters {
 		if !accept(key) {
@@ -42,10 +81,14 @@ func (config *Config) GetEntry(key string) (EntryInterface, bool) {
 func (config *Config) Entries() <-chan EntryInterface {
 	ch := make(chan EntryInterface)
 
+	// provide the order if not already set
+	config.orderIfNotProvided()
+
 	go func() {
 		defer close(ch)
 
-		for _, entry := range config.entries {
+		for _, key := range config.order {
+			entry := config.entries[key]
 			if !config.Accept(entry.GetKey()) {
 				continue
 			}
@@ -90,6 +133,9 @@ func (config *Config) Only(keys ...string) *Config {
 	}
 }
 
+// ToFlags converts the config entries to a slice of command line flags
+// If useShort is true, it will use the short flag names if available, otherwise it will use the long flag names
+// If the entry is a boolean, it will only add the flag if the value is true
 func (config *Config) ToFlags(useShort bool) []string {
 	out := make([]string, 0)
 	for _, e := range config.entries {
@@ -105,13 +151,14 @@ func (config *Config) ToFlags(useShort bool) []string {
 				if b {
 					out = append(out, "-"+sfn)
 				} else {
-					// falbback to long flag
+					// fallback to long flag
 					out = append(out, fmt.Sprintf("--%s=%s", fn, e.String()))
 				}
 			default:
 				out = append(out, "-"+sfn, e.String())
 			}
 		} else {
+			// long case
 			out = append(out, fmt.Sprintf("--%s=%s", fn, e.String()))
 		}
 	}

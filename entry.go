@@ -12,12 +12,13 @@ import (
 	"time"
 )
 
+// Entry is a structure that represents an item in the configuration
 type Entry[T any] struct {
 	Metadata  *EntryMetadata
 	Key       string
 	ValueP    *T // to bind the Value if not stored by the entry
 	Value     T
-	converter Converter[T]
+	converter Converter[T] // pivot structure for frontends
 }
 
 func NewEntry[T any](Key string) *Entry[T] {
@@ -31,6 +32,10 @@ func NewEntry[T any](Key string) *Entry[T] {
 
 func (e *Entry[T]) autoMetadata() {
 	e.Metadata = newMetadataFromEntry(e.Key)
+	var t T
+	if _, ok := any(t).(bool); ok {
+		e.Metadata.IsBool = true
+	}
 }
 
 // Wire performs all the plumbing
@@ -77,6 +82,8 @@ func (e *Entry[T]) wire() {
 	}
 }
 
+// EntryInterface is the object that unifies all the provided entries
+// (that have different types)
 type EntryInterface interface {
 	GetKey() string
 	GetValue() interface{}
@@ -87,14 +94,27 @@ type EntryInterface interface {
 	Convert(frontend Frontend, args ...any) error
 }
 
+// Join a slice of strings into a single string using the entry's slice separator
+func join(s []string, entry EntryInterface) string {
+	var out strings.Builder
+	w := csv.NewWriter(&out)
+	w.Comma = entry.GetMetadata().SliceSeparator
+	w.Write(s)
+	w.Flush()
+	return out.String()
+}
+
+// GetKey returns the key of the entry
 func (e *Entry[T]) GetKey() string {
 	return e.Key
 }
 
+// GetValue returns the value of the entry as an interface{}.
 func (e *Entry[T]) GetValue() interface{} {
 	return *e.ValueP
 }
 
+// GetMetadata returns the metadata of the entry
 func (e *Entry[T]) GetMetadata() *EntryMetadata {
 	return e.Metadata
 }
@@ -130,6 +150,8 @@ func (e *Entry[T]) String() string {
 	}
 }
 
+// Convert converts the entry value using the provided frontend and arguments.
+// It updates the value of the entry.
 func (e *Entry[T]) Convert(frontend Frontend, args ...any) error {
 	return e.converter.Convert(frontend, e, args...)
 }
@@ -159,4 +181,10 @@ func (e *Entry[T]) csvWriter(w io.Writer) *csv.Writer {
 	writer := csv.NewWriter(w)
 	writer.Comma = e.Metadata.SliceSeparator
 	return writer
+}
+
+// For flag package compatibility
+// see https://pkg.go.dev/flag#Value
+func (e *Entry[T]) IsBoolFlag() bool {
+	return e.Metadata.IsBool
 }

@@ -13,6 +13,7 @@ type EntryMetadata struct {
 	Format         string
 	SliceSeparator rune
 	IsConfigFile   bool
+	IsBool         bool
 }
 
 type MetadataOption = func(*EntryMetadata)
@@ -47,6 +48,7 @@ func newMetadataFromEntry(key string) *EntryMetadata {
 		Format:         "",
 		SliceSeparator: ',',
 		IsConfigFile:   false,
+		IsBool:         false,
 	}
 }
 

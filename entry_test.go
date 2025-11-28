@@ -70,3 +70,25 @@ func TestSetWithBadInput(t *testing.T) {
 
 	}
 }
+
+func TestIsBoolFlag(t *testing.T) {
+	c, _ := randomConfig()
+
+	ei, ok := c.GetEntry("bool")
+	if !ok {
+		t.Errorf("Expected entry to exist")
+	}
+	e, ok := ei.(*Entry[bool])
+	if !ok {
+		t.Errorf("Expected entry to be of type Entry[bool]")
+	}
+	if e.IsBoolFlag() != true {
+		t.Errorf("Expected true, got false")
+	}
+
+	for _, e := range c.entries {
+		if e.GetKey() != "bool" && e.GetMetadata().IsBool {
+			t.Errorf("Expected IsBool to be false for key %s, got true", e.GetKey())
+		}
+	}
+}
