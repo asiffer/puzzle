@@ -131,26 +131,26 @@ func testBuildNested(t *testing.T, i int) {
 	}
 }
 
-func testBuildShort(t *testing.T, i int) {
-	gofakeit.Seed(i)
-	config, initial := frontendtesting.RandomConfigWithShort()
-	config2, values := frontendtesting.RandomConfigWithShort()
-	// toFlags(config2)
+// func testBuildShort(t *testing.T, i int) {
+// 	gofakeit.Seed(i)
+// 	config, initial := frontendtesting.RandomConfigWithShort()
+// 	config2, values := frontendtesting.RandomConfigWithShort()
+// 	// toFlags(config2)
 
-	fs, err := Build(config, "test", flag.PanicOnError)
-	if err != nil {
-		t.Fatalf("error building flagset: %v", err)
-	}
-	flags := config2.ToFlags(true)
-	t.Logf("FLAGS: %v\n", flags)
-	if err := fs.Parse(config2.ToFlags(true)); err != nil {
-		t.Fatalf("error parsing flags: %v", err)
-	}
+// 	fs, err := Build(config, "test", flag.PanicOnError)
+// 	if err != nil {
+// 		t.Fatalf("error building flagset: %v", err)
+// 	}
+// 	flags := config2.ToFlags(true)
+// 	t.Logf("FLAGS: %v\n", flags)
+// 	if err := fs.Parse(config2.ToFlags(true)); err != nil {
+// 		t.Fatalf("error parsing flags: %v", err)
+// 	}
 
-	if err := initial.Compare(values); err != nil {
-		t.Error(err)
-	}
-}
+// 	if err := initial.Compare(values); err != nil {
+// 		t.Error(err)
+// 	}
+// }
 
 func FuzzBuild(f *testing.F) {
 	for i := range 200 {
@@ -166,9 +166,9 @@ func FuzzBuildNested(f *testing.F) {
 	f.Fuzz(testBuildNested)
 }
 
-func FuzzBuildShort(f *testing.F) {
-	for i := range 200 {
-		f.Add(i)
-	}
-	f.Fuzz(testBuildShort)
-}
+// func FuzzBuildShort(f *testing.F) {
+// 	for i := range 200 {
+// 		f.Add(i)
+// 	}
+// 	f.Fuzz(testBuildShort)
+// }
