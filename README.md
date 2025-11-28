@@ -422,11 +422,11 @@ package config
 var konf = puzzle.NewConfig()
 
 func Define[T any](key string, defaultValue T, options ...puzzle.MetadataOption) error {
-    return puzzle.Define[T](konf, key, defaultValue, &question, options...)
+    return puzzle.Define[T](konf, key, defaultValue, options...)
 }
 
 func DefineVar[T any](key string, boundVariable *T, options ...puzzle.MetadataOption) error {
-    return puzzle.DefineVar[T](konf, key, boundVariable, &question, options...)
+    return puzzle.DefineVar[T](konf, key, boundVariable, options...)
 }
 
 func Get[T](key string) (T, error) {
