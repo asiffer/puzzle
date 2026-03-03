@@ -10,7 +10,7 @@ var UintConverter = newConverter(uintFromString)
 func uintFromString(entry *Entry[uint], stringValue string) error {
 	value, err := strconv.ParseUint(stringValue, 10, uintBits)
 	if err != nil {
-		return err
+		return &InvalidValueError{Key: entry.Key, Value: stringValue, Err: err}
 	}
 	*entry.ValueP = uint(value)
 	entry.Value = uint(value)

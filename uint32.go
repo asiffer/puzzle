@@ -7,7 +7,7 @@ var Uint32Converter = newConverter(uint32FromString)
 func uint32FromString(entry *Entry[uint32], stringValue string) error {
 	value, err := strconv.ParseUint(stringValue, 10, 32)
 	if err != nil {
-		return err
+		return &InvalidValueError{Key: entry.Key, Value: stringValue, Err: err}
 	}
 	*entry.ValueP = uint32(value)
 	entry.Value = uint32(value)

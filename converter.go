@@ -26,7 +26,7 @@ func ConvertCallbackFactory1[T any, A any](fun func(entry *Entry[T], arg A) erro
 
 		a, ok := args[0].(A)
 		if ok {
-			return fun(entry, A(a))
+			return fun(entry, a)
 		}
 		return fmt.Errorf("[ConvertCallbackFactory1] expected an argument of type %T, got %v (%T)", t, args[0], args[0])
 	}

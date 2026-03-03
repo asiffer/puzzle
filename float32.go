@@ -7,7 +7,7 @@ var Float32Converter = newConverter(float32FromString)
 func float32FromString(entry *Entry[float32], stringValue string) error {
 	value, err := strconv.ParseFloat(stringValue, 32)
 	if err != nil {
-		return err
+		return &InvalidValueError{Key: entry.Key, Value: stringValue, Err: err}
 	}
 	*entry.ValueP = float32(value)
 	entry.Value = float32(value)

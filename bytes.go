@@ -17,17 +17,17 @@ func bytesFromString(entry *Entry[[]byte], stringValue string) error {
 	case "base64":
 		value, err = base64.StdEncoding.DecodeString(stringValue)
 		if err != nil {
-			return fmt.Errorf("error while decoding as base64: %v", err)
+			return &InvalidValueError{Key: entry.Key, Value: stringValue, Err: fmt.Errorf("error while decoding as base64: %v", err)}
 		}
 	case "base32":
 		value, err = base32.StdEncoding.DecodeString(stringValue)
 		if err != nil {
-			return fmt.Errorf("error while decoding as base32: %v", err)
+			return &InvalidValueError{Key: entry.Key, Value: stringValue, Err: fmt.Errorf("error while decoding as base32: %v", err)}
 		}
 	default: // hex
 		value, err = hex.DecodeString(stringValue)
 		if err != nil {
-			return fmt.Errorf("error while decoding as hex: %v", err)
+			return &InvalidValueError{Key: entry.Key, Value: stringValue, Err: fmt.Errorf("error while decoding as hex: %v", err)}
 		}
 	}
 
