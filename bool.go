@@ -16,7 +16,7 @@ func boolFromString(entry *Entry[bool], stringValue string) error {
 	default:
 		value, err = strconv.ParseBool(stringValue)
 		if err != nil {
-			return err
+			return &InvalidValueError{Key: entry.Key, Value: stringValue, Err: err}
 		}
 	}
 

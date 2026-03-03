@@ -14,7 +14,7 @@ func stringSliceFromString(entry *Entry[[]string], stringValue string) error {
 		reader := entry.csvReader(strings.NewReader(stringValue))
 		value, err = reader.Read()
 		if err != nil {
-			return err
+			return &InvalidValueError{Key: entry.Key, Value: stringValue, Err: err}
 		}
 	}
 

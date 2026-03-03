@@ -7,7 +7,7 @@ var Uint8Converter = newConverter(uint8FromString)
 func uint8FromString(entry *Entry[uint8], stringValue string) error {
 	value, err := strconv.ParseUint(stringValue, 10, 8)
 	if err != nil {
-		return err
+		return &InvalidValueError{Key: entry.Key, Value: stringValue, Err: err}
 	}
 	*entry.ValueP = uint8(value)
 	entry.Value = uint8(value)

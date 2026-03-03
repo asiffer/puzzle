@@ -27,7 +27,7 @@ func recursiveJSON(config *puzzle.Config, data interface{}, prefix string, out m
 	case []interface{}:
 		entry, exists := config.GetEntry(prefix)
 		if !exists {
-			return fmt.Errorf("key %s is not accepted by the configuration", prefix)
+			return &puzzle.KeyNotFoundError{Key: prefix}
 		}
 
 		sb := strings.Builder{}
@@ -48,7 +48,7 @@ func recursiveJSON(config *puzzle.Config, data interface{}, prefix string, out m
 	default:
 		_, exists := config.GetEntry(prefix)
 		if !exists {
-			return fmt.Errorf("key %s is not accepted by the configuration", prefix)
+			return &puzzle.KeyNotFoundError{Key: prefix}
 		}
 		out[prefix] = fmt.Sprintf("%v", val)
 		return nil

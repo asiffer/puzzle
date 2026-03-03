@@ -10,7 +10,7 @@ var IntConverter = newConverter(intFromString)
 func intFromString(entry *Entry[int], stringValue string) error {
 	value, err := strconv.ParseInt(stringValue, 10, intBits)
 	if err != nil {
-		return err
+		return &InvalidValueError{Key: entry.Key, Value: stringValue, Err: err}
 	}
 	*entry.ValueP = int(value)
 	entry.Value = int(value)

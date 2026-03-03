@@ -1,12 +1,8 @@
 package puzzle
 
-import (
-	"fmt"
-)
-
 func insert[T any](config *Config, entry *Entry[T], options ...MetadataOption) error {
 	if _, exists := config.entries[entry.Key]; exists {
-		return fmt.Errorf("key %s already exists", entry.Key)
+		return &KeyAlreadyExistsError{Key: entry.Key}
 	}
 	// apply options
 	for _, option := range options {
@@ -39,11 +35,11 @@ func Get[T any](config *Config, key string) (T, error) {
 	var out T
 	entry, exists := config.entries[key]
 	if !exists {
-		return out, fmt.Errorf("key %s not found", key)
+		return out, &KeyNotFoundError{Key: key}
 	}
 	Value, ok := entry.GetValue().(T)
 	if !ok {
-		return out, fmt.Errorf("type mismatch: requested %T, got %T", out, entry.GetValue())
+		return out, newTypeMismatchError(key, out, entry.GetValue())
 	}
 	return Value, nil
 }
